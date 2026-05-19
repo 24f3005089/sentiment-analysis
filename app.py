@@ -1,8 +1,18 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import List
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+# ENABLE CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class SentimentRequest(BaseModel):
     sentences: List[str]
@@ -13,14 +23,15 @@ def home():
 
 @app.post("/sentiment")
 def analyze_sentiment(data: SentimentRequest):
+
     happy_words = [
-        "love", "great", "happy", "excellent", "good",
-        "awesome", "amazing", "fantastic", "wonderful"
+        "love", "great", "happy", "excellent",
+        "good", "awesome", "amazing", "fantastic"
     ]
 
     sad_words = [
-        "sad", "terrible", "bad", "hate", "awful",
-        "worst", "angry", "upset", "horrible"
+        "sad", "terrible", "bad", "hate",
+        "awful", "worst", "angry", "horrible"
     ]
 
     results = []
