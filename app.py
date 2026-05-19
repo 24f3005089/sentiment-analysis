@@ -16,12 +16,8 @@ app.add_middleware(
 class SentimentRequest(BaseModel):
     sentences: List[str]
 
-@app.get("/")
-async def root():
-    return {"message": "API is working"}
-
-@app.post("/sentiment")
-async def analyze_sentiment(data: SentimentRequest):
+def predict_sentiment(sentence: str):
+    text = sentence.lower()
 
     happy_words = [
         "love", "great", "excellent", "happy",
@@ -33,24 +29,41 @@ async def analyze_sentiment(data: SentimentRequest):
         "awful", "worst", "angry", "horrible"
     ]
 
+    if any(word in text for word in happy_words):
+        return "happy"
+
+    if any(word in text for word in sad_words):
+        return "sad"
+
+    return "neutral"
+
+@app.get("/")
+async def home():
+    return {"message": "Sentiment API running"}
+
+# IMPORTANT: accept POST on root URL also
+@app.post("/")
+async def root_sentiment(data: SentimentRequest):
+
     results = []
 
     for sentence in data.sentences:
-
-        text = sentence.lower()
-
-        if any(word in text for word in happy_words):
-            sentiment = "happy"
-
-        elif any(word in text for word in sad_words):
-            sentiment = "sad"
-
-        else:
-            sentiment = "neutral"
-
         results.append({
             "sentence": sentence,
-            "sentiment": sentiment
+            "sentiment": predict_sentiment(sentence)
+        })
+
+    return {"results": results}
+
+@app.post("/sentiment")
+async def sentiment(data: SentimentRequest):
+
+    results = []
+
+    for sentence in data.sentences:
+        results.append({
+            "sentence": sentence,
+            "sentiment": predict_sentiment(sentence)
         })
 
     return {"results": results}
