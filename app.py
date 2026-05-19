@@ -17,25 +17,35 @@ class SentimentRequest(BaseModel):
     sentences: List[str]
 
 def predict_sentiment(sentence: str):
+
     text = sentence.lower()
 
     happy_words = [
-        "love", "great", "excellent", "happy",
-        "awesome", "good", "amazing", "fantastic"
+        "love", "great", "excellent", "happy", "awesome",
+        "good", "amazing", "fantastic", "wonderful", "best",
+        "nice", "cool", "liked", "like", "enjoy", "enjoyed",
+        "brilliant", "positive", "smile", "fun", "beautiful"
     ]
 
     sad_words = [
-        "hate", "bad", "terrible", "sad",
-        "awful", "worst", "angry", "horrible"
+        "hate", "bad", "terrible", "sad", "awful",
+        "worst", "angry", "horrible", "boring", "poor",
+        "disappointed", "disappointing", "upset", "annoying",
+        "pain", "cry", "depressed", "negative", "problem",
+        "useless", "dislike"
     ]
 
-    if any(word in text for word in happy_words):
+    happy_score = sum(word in text for word in happy_words)
+    sad_score = sum(word in text for word in sad_words)
+
+    if happy_score > sad_score:
         return "happy"
 
-    if any(word in text for word in sad_words):
+    elif sad_score > happy_score:
         return "sad"
 
-    return "neutral"
+    else:
+        return "neutral"
 
 @app.get("/")
 async def home():
